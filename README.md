@@ -2,6 +2,8 @@
 
 *Predict engine failure before it happens: RUL forecasting with uncertainty and cost-based alerts.*
 
+**Live demo:** [wadud-prognosai.streamlit.app](https://wadud-prognosai.streamlit.app/)
+
 Predictive maintenance on the NASA C-MAPSS turbofan dataset.
 
 Predict remaining useful life (RUL) of turbofan engines from multivariate sensor time series, and turn the predictions into maintenance alerts.
@@ -15,17 +17,20 @@ Predict remaining useful life (RUL) of turbofan engines from multivariate sensor
 - [x] Cost-based alert threshold (chosen on validation engines, applied once to test)
 - [x] Unit tests + GitHub Actions CI
 - [x] Explainability: exact TreeSHAP sensor importance (LightGBM pred_contrib)
-- [x] Streamlit dashboard (fleet view, engine view, sensor drivers)
+- [x] Streamlit dashboard (fleet view, engine view, sensor drivers), deployed on Streamlit Community Cloud
 - [x] FastAPI prediction endpoint + Dockerfile
 
 ## Run
     pip install -r requirements.txt
     python -m src.baseline FD001
-    python -m src.deep FD001 gru 30   # or cnn
     python -m src.quantile FD001      # intervals + alert policies
     python -m src.explain FD001       # sensor importance chart
     streamlit run app/dashboard.py    # interactive dashboard
     python -m pytest -q
+
+    # CNN / GRU comparison models need TensorFlow:
+    pip install -r requirements-deep.txt
+    python -m src.deep FD001 gru 30   # or cnn
 
 Data: NASA C-MAPSS (simulated turbofan run-to-failure data), in data/raw/.
 
@@ -42,8 +47,7 @@ Data: NASA C-MAPSS (simulated turbofan run-to-failure data), in data/raw/.
 | FD003 | LightGBM | 14.4 | 338 |
 | FD004 | LightGBM | 27.7 | 5561 |
 
-Deep models are untuned first passes (single seed, 80/20 engine split for early stopping). Tuned results will replace these.
-
+Deep models are first passes (single seed, 80/20 engine split for early stopping, FD001 only). A 2-seed ensemble and a LightGBM blend did not beat LightGBM alone, so LightGBM is the main model; the deep models are kept as a documented comparison.
 
 ## Uncertainty and cost-based alerts (LightGBM quantile models)
 
@@ -63,20 +67,21 @@ Limitations:
 - Costs and lead time are illustrative assumptions, not real maintenance data, and the test sets have only 100-259 engines, so differences between the two alert policies are small.
 - C-MAPSS is simulated data.
 
-
 ## Dashboard
 
-`streamlit run app/dashboard.py` trains the quantile models for the chosen subset (about 15 seconds, cached) and shows:
+**Try it live: [wadud-prognosai.streamlit.app](https://wadud-prognosai.streamlit.app/)** (free hosting; if the app is asleep, give it a moment to wake up. The first visit to each dataset trains the models, which takes a short while.)
+
+Locally, `streamlit run app/dashboard.py` trains the quantile models for the chosen subset (about 15 seconds, cached) and shows:
 - **Fleet view:** every engine with predicted RUL, an 80% interval and an ALERT / WATCH / OK status, sorted by the RUL lower bound.
 - **Engine view:** predicted RUL over time with its interval against the benchmark ground truth, plus the top sensor trends.
 - **Sensor drivers:** which sensors push the predicted RUL up or down (TreeSHAP).
 - Sidebar sliders for lead time and the costs of missed failures and false alarms; the alert threshold is re-tuned on validation engines each time.
 
-![Top sensors](reports/sensor_importance_FD001.png)
-
 ![Fleet view](reports/dashboard_fleet.png)
 ![Engine view](reports/dashboard_engine.png)
 ![Sensor trends](reports/dashboard_sensors.png)
+![Top sensors](reports/sensor_importance_FD001.png)
+
 ## API and Docker
 
 A FastAPI service returns RUL, an 80% interval and an alert status for one engine's sensor history.
@@ -105,7 +110,7 @@ Architecture: `data -> per-condition normalisation -> 30-cycle window features -
 - B.E. Computer Engineering, GPA 3.60 / 4.0, semester topper with an appreciation certificate
 - Skills: Python, TensorFlow/Keras, LightGBM, OpenCV, Streamlit, FastAPI, Docker
 - Licensed engineer, Nepal Engineering Council (NEC)
-- Other work: skin lesion classification with EfficientNet-B3 transfer learning (final year project), and a bilingual Arabic/English RAG assistant
+- Other work: skin lesion classification with EfficientNet-B3 transfer learning (final year project), and a bilingual Arabic/English RAG assistant and other 20+ projects
 
 **GitHub:** [github.com/Wadud-Ansari](https://github.com/Wadud-Ansari)
 **This project:** [github.com/Wadud-Ansari/PrognosAI](https://github.com/Wadud-Ansari/PrognosAI)
