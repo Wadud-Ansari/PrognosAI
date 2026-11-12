@@ -95,3 +95,22 @@ Example request body for `POST /predict`: `{"subset": "FD001", "readings": [{"cy
 Response: `rul_q10`, `rul_median`, `rul_q90`, `alert_threshold`, `status` (ALERT / WATCH / OK) and a `note` when fewer than 30 cycles are supplied.
 
 Architecture: `data -> per-condition normalisation -> 30-cycle window features -> quantile LightGBM -> interval + cost-tuned threshold -> ALERT/WATCH/OK`, served by the dashboard (Streamlit) or the API (FastAPI).
+
+---
+
+## About the author
+
+**Wadud Ansari**: Computer Engineer, focused on AI/ML and computer vision.
+
+- B.E. Computer Engineering, GPA 3.60 / 4.0, semester topper with an appreciation certificate
+- Skills: Python, TensorFlow/Keras, LightGBM, OpenCV, Streamlit, FastAPI, Docker
+- Licensed engineer, Nepal Engineering Council (NEC)
+- Other work: skin lesion classification with EfficientNet-B3 transfer learning (final year project), and a bilingual Arabic/English RAG assistant
+
+**GitHub:** [github.com/Wadud-Ansari](https://github.com/Wadud-Ansari)
+**This project:** [github.com/Wadud-Ansari/PrognosAI](https://github.com/Wadud-Ansari/PrognosAI)
+
+To run it yourself:
+
+    git clone https://github.com/Wadud-Ansari/PrognosAI.git
+    cd PrognosAI
