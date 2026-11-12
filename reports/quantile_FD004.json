@@ -1,0 +1,35 @@
+{
+ "subset": "FD004",
+ "median_rmse": 27.15964994545152,
+ "median_nasa": 5232.359250357493,
+ "interval_80_coverage": 0.657258064516129,
+ "mean_interval_width": 29.19597518615668,
+ "alert_median": {
+  "threshold": 43.0,
+  "cost_per_engine": 0.11693548387096774,
+  "missed_failures": 1,
+  "false_alarms": 19,
+  "n_engines": 248
+ },
+ "alert_lower_bound_q10": {
+  "threshold": 33.0,
+  "cost_per_engine": 0.10483870967741936,
+  "missed_failures": 1,
+  "false_alarms": 16,
+  "n_engines": 248
+ },
+ "alert_never": {
+  "threshold": -1,
+  "cost_per_engine": 2.1370967741935485,
+  "missed_failures": 53,
+  "false_alarms": 0,
+  "n_engines": 248
+ },
+ "alert_always": {
+  "threshold": 1000000000.0,
+  "cost_per_engine": 0.7862903225806451,
+  "missed_failures": 0,
+  "false_alarms": 195,
+  "n_engines": 248
+ }
+}

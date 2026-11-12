@@ -11,8 +11,9 @@ Predict remaining useful life (RUL) of turbofan engines from multivariate sensor
 - [x] Metrics: RMSE + NASA asymmetric score
 - [x] LightGBM baseline (rolling mean/std/slope features)
 - [x] 1D-CNN and GRU on 30-cycle windows (Keras), first pass on FD001 only
-- [ ] Uncertainty (quantile regression / MC dropout)
-- [ ] Cost-based alert threshold
+- [x] Uncertainty: quantile LightGBM (10th/50th/90th percentile) -> RUL intervals
+- [x] Cost-based alert threshold (chosen on validation engines, applied once to test)
+- [x] Unit tests + GitHub Actions CI
 - [ ] SHAP explainability
 - [ ] Streamlit dashboard, FastAPI + Docker
 
@@ -20,6 +21,8 @@ Predict remaining useful life (RUL) of turbofan engines from multivariate sensor
     pip install -r requirements.txt
     python -m src.baseline FD001
     python -m src.deep FD001 gru 30   # or cnn
+    python -m src.quantile FD001      # intervals + alert policies
+    python -m pytest -q
 
 Data: NASA C-MAPSS (simulated turbofan run-to-failure data), in data/raw/.
 
@@ -37,3 +40,22 @@ Data: NASA C-MAPSS (simulated turbofan run-to-failure data), in data/raw/.
 | FD004 | LightGBM | 27.7 | 5561 |
 
 Deep models are untuned first passes (single seed, 80/20 engine split for early stopping). Tuned results will replace these.
+
+
+## Uncertainty and cost-based alerts (LightGBM quantile models)
+
+Median RMSE is on par with the point model. An alert fires when the predicted RUL (lower bound or median) is at or below a threshold T.
+Assumptions: lead time 30 cycles; a missed failure (no alert, true RUL <= 30) costs 10; a false alarm (alert, true RUL > 30) costs 1.
+T is tuned on held-out validation engines, never on the test set. Cost is per test engine (lower is better).
+
+| Subset | Median RMSE | 80% interval coverage | Never alert | Always alert | Alert on median | Alert on lower bound (q10) |
+|---|---|---|---|---|---|---|
+| FD001 | 13.2 | 0.64 | 2.50 | 0.75 | 0.04 | 0.02 |
+| FD002 | 26.1 | 0.69 | 2.36 | 0.76 | 0.04 | 0.05 |
+| FD003 | 14.9 | 0.70 | 2.00 | 0.80 | 0.02 | 0.02 |
+| FD004 | 27.2 | 0.66 | 2.14 | 0.79 | 0.12 | 0.10 |
+
+Limitations:
+- The nominal 80% intervals cover only 64-70% of true values, so they are overconfident; calibration (e.g. conformal prediction) is future work.
+- Costs and lead time are illustrative assumptions, not real maintenance data, and the test sets have only 100-259 engines, so differences between the two alert policies are small.
+- C-MAPSS is simulated data.
