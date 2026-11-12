@@ -2,10 +2,6 @@ numpy
 pandas
 scikit-learn
 lightgbm
-tensorflow-cpu
 matplotlib
-streamlit
 plotly
-pytest
-fastapi
-uvicorn
+streamlit==1.67.0
