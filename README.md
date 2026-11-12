@@ -16,7 +16,7 @@ Predict remaining useful life (RUL) of turbofan engines from multivariate sensor
 - [x] Unit tests + GitHub Actions CI
 - [x] Explainability: exact TreeSHAP sensor importance (LightGBM pred_contrib)
 - [x] Streamlit dashboard (fleet view, engine view, sensor drivers)
-- [ ] FastAPI endpoint + Docker
+- [x] FastAPI prediction endpoint + Dockerfile
 
 ## Run
     pip install -r requirements.txt
@@ -73,3 +73,23 @@ Limitations:
 - Sidebar sliders for lead time and the costs of missed failures and false alarms; the alert threshold is re-tuned on validation engines each time.
 
 ![Top sensors](reports/sensor_importance_FD001.png)
+
+
+## API and Docker
+
+A FastAPI service returns RUL, an 80% interval and an alert status for one engine's sensor history.
+
+    # local
+    python -m src.train_final FD001          # optional: pre-train and save models (else trains on first request)
+    uvicorn api.main:app --reload            # docs at http://127.0.0.1:8000/docs
+
+    # docker (trains all four subsets during the image build)
+    docker build -t prognosai .
+    docker run -p 8000:8000 prognosai
+
+Endpoints: `GET /health`, `GET /subsets` (lists required columns), `POST /predict`.
+
+Example request body for `POST /predict`: `{"subset": "FD001", "readings": [{"cycle": 1, "op1": -0.0007, "op2": -0.0004, "op3": 100, "s1": 518.67, ... "s21": 23.4190}, ...]}` with one object per cycle, oldest first, and all of `cycle, op1-op3, s1-s21`.
+Response: `rul_q10`, `rul_median`, `rul_q90`, `alert_threshold`, `status` (ALERT / WATCH / OK) and a `note` when fewer than 30 cycles are supplied.
+
+Architecture: `data -> per-condition normalisation -> 30-cycle window features -> quantile LightGBM -> interval + cost-tuned threshold -> ALERT/WATCH/OK`, served by the dashboard (Streamlit) or the API (FastAPI).

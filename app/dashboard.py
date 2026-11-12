@@ -116,8 +116,8 @@ with tab_fleet:
         yaxis_title="Predicted RUL (cycles), 80% interval",
         margin=dict(t=20),
     )
-    st.plotly_chart(fig, use_container_width=True)
-    st.dataframe(df, use_container_width=True, height=320)
+    st.plotly_chart(fig, width="stretch")
+    st.dataframe(df, width="stretch", height=320)
 
 # ---------------- engine ----------------
 with tab_engine:
@@ -143,7 +143,7 @@ with tab_engine:
     )
     fig.add_hline(y=T, line_dash="dash", line_color="#d62728", annotation_text="alert threshold")
     fig.update_layout(height=380, xaxis_title="Cycle", yaxis_title="RUL (cycles)", margin=dict(t=20))
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
     st.markdown(f"Current status of engine {unit}: **{status[i]}**")
 
     top = list(b["importance"])[:4]
@@ -155,7 +155,7 @@ with tab_engine:
         height=300, xaxis_title="Cycle", yaxis_title="Sensor (normalised)",
         title="Top sensor trends for this engine", margin=dict(t=40),
     )
-    st.plotly_chart(fig2, use_container_width=True)
+    st.plotly_chart(fig2, width="stretch")
 
 # ---------------- sensors ----------------
 with tab_sensors:
@@ -164,7 +164,7 @@ with tab_sensors:
         go.Bar(x=[v for _, v in imp], y=[k_ for k_, _ in imp], orientation="h", marker_color="#2a6fdb")
     )
     fig.update_layout(height=420, xaxis_title="mean |SHAP| contribution to predicted RUL (cycles)", margin=dict(t=20))
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
     st.caption(
         "Exact TreeSHAP values from the median LightGBM model, summed over each sensor's window "
         "features (last value, mean, std, slope)."
