@@ -74,7 +74,9 @@ Limitations:
 
 ![Top sensors](reports/sensor_importance_FD001.png)
 
-
+![Fleet view](reports/dashboard_fleet.png)
+![Engine view](reports/dashboard_engine.png)
+![Sensor trends](reports/dashboard_sensors.png)
 ## API and Docker
 
 A FastAPI service returns RUL, an 80% interval and an alert status for one engine's sensor history.
