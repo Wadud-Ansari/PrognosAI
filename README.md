@@ -29,7 +29,9 @@ Data: NASA C-MAPSS (simulated turbofan run-to-failure data), in data/raw/.
 |---|---|---|---|
 | FD001 | LightGBM (window features) | 13.3 | 237 |
 | FD001 | GRU | 15.7 | 371 |
+| FD001 | GRU ensemble (2 seeds) | 15.9 | 348 |
 | FD001 | 1D-CNN | 19.0 | 977 |
+| FD001 | 0.7 LightGBM + 0.3 GRU blend | 13.5 | 237 |
 | FD002 | LightGBM | 26.8 | 8291 |
 | FD003 | LightGBM | 14.4 | 338 |
 | FD004 | LightGBM | 27.7 | 5561 |
