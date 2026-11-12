@@ -14,14 +14,17 @@ Predict remaining useful life (RUL) of turbofan engines from multivariate sensor
 - [x] Uncertainty: quantile LightGBM (10th/50th/90th percentile) -> RUL intervals
 - [x] Cost-based alert threshold (chosen on validation engines, applied once to test)
 - [x] Unit tests + GitHub Actions CI
-- [ ] SHAP explainability
-- [ ] Streamlit dashboard, FastAPI + Docker
+- [x] Explainability: exact TreeSHAP sensor importance (LightGBM pred_contrib)
+- [x] Streamlit dashboard (fleet view, engine view, sensor drivers)
+- [ ] FastAPI endpoint + Docker
 
 ## Run
     pip install -r requirements.txt
     python -m src.baseline FD001
     python -m src.deep FD001 gru 30   # or cnn
     python -m src.quantile FD001      # intervals + alert policies
+    python -m src.explain FD001       # sensor importance chart
+    streamlit run app/dashboard.py    # interactive dashboard
     python -m pytest -q
 
 Data: NASA C-MAPSS (simulated turbofan run-to-failure data), in data/raw/.
@@ -59,3 +62,14 @@ Limitations:
 - The nominal 80% intervals cover only 64-70% of true values, so they are overconfident; calibration (e.g. conformal prediction) is future work.
 - Costs and lead time are illustrative assumptions, not real maintenance data, and the test sets have only 100-259 engines, so differences between the two alert policies are small.
 - C-MAPSS is simulated data.
+
+
+## Dashboard
+
+`streamlit run app/dashboard.py` trains the quantile models for the chosen subset (about 15 seconds, cached) and shows:
+- **Fleet view:** every engine with predicted RUL, an 80% interval and an ALERT / WATCH / OK status, sorted by the RUL lower bound.
+- **Engine view:** predicted RUL over time with its interval against the benchmark ground truth, plus the top sensor trends.
+- **Sensor drivers:** which sensors push the predicted RUL up or down (TreeSHAP).
+- Sidebar sliders for lead time and the costs of missed failures and false alarms; the alert threshold is re-tuned on validation engines each time.
+
+![Top sensors](reports/sensor_importance_FD001.png)

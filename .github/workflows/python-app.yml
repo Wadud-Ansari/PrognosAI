@@ -15,6 +15,6 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install dependencies
-        run: pip install numpy pandas scikit-learn lightgbm pytest
+        run: pip install numpy pandas scikit-learn lightgbm matplotlib streamlit plotly pytest
       - name: Run tests
         run: python -m pytest -q

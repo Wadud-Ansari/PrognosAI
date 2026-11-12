@@ -6,6 +6,6 @@ tensorflow-cpu
 matplotlib
 streamlit
 plotly
-shap
+pytest
 fastapi
 uvicorn
